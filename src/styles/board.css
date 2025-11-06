@@ -1,0 +1,247 @@
+/* Plateau BLOK 8x8 */
+
+.game-board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 0;
+  
+  /* Calcul pour cases parfaitement carrées */
+  --available-height: calc(100vh - 160px); /* Marges haut/bas */
+  --cell-size: min(calc(100vw / 8), calc(var(--available-height) / 8));
+  
+  width: calc(var(--cell-size) * 8);
+  height: calc(var(--cell-size) * 8);
+  
+  /* Centrage */
+  margin: 0 auto;
+}
+
+.board-cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+/* Numéros de ligne */
+.line-number {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: 'Inter', sans-serif;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Couleur du texte selon le fond de la case - Damier 8x8 */
+/* Utilisation de nth-child pour alternance automatique */
+
+/* Cases blanches (#F2F5FA) - texte bleu (#5596F2) */
+/* Lignes impaires : cases impaires sont blanches */
+.board-cell:nth-child(16n+1) .line-number,
+.board-cell:nth-child(16n+3) .line-number,
+.board-cell:nth-child(16n+5) .line-number,
+.board-cell:nth-child(16n+7) .line-number,
+/* Lignes paires : cases paires sont blanches */
+.board-cell:nth-child(16n+10) .line-number,
+.board-cell:nth-child(16n+12) .line-number,
+.board-cell:nth-child(16n+14) .line-number,
+.board-cell:nth-child(16n+16) .line-number {
+  color: #5596F2;
+}
+
+/* Cases bleues (#5596F2) - texte blanc (#F2F5FA) */
+/* Lignes impaires : cases paires sont bleues */
+.board-cell:nth-child(16n+2) .line-number,
+.board-cell:nth-child(16n+4) .line-number,
+.board-cell:nth-child(16n+6) .line-number,
+.board-cell:nth-child(16n+8) .line-number,
+/* Lignes paires : cases impaires sont bleues */
+.board-cell:nth-child(16n+9) .line-number,
+.board-cell:nth-child(16n+11) .line-number,
+.board-cell:nth-child(16n+13) .line-number,
+.board-cell:nth-child(16n+15) .line-number {
+  color: #F2F5FA;
+}
+
+/* Pièces */
+.piece {
+  width: 65%;
+  height: 65%;
+  object-fit: contain;
+  z-index: 5;
+}
+
+/* Pièces BLOKER - 30% plus petites */
+.piece.bloker {
+  width: calc(65% * 0.7);
+  height: calc(65% * 0.7);
+}
+
+/* BLOKER à retirer (bordure rouge) */
+.piece.removable-bloker {
+  border: 3px solid #ff3b30;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(255, 59, 48, 0.5);
+  animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 5px rgba(255, 59, 48, 0.5); }
+  50% { box-shadow: 0 0 15px rgba(255, 59, 48, 0.8); }
+  100% { box-shadow: 0 0 5px rgba(255, 59, 48, 0.5); }
+}
+
+/* Indicateur de mouvement possible */
+.move-indicator {
+  width: 24px;
+  height: 24px;
+  background-color: rgba(0, 0, 0, 0.15); /* Noir à 15% d'opacité */
+  border-radius: 50%;
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* Adaptation mobile - Indicateurs plus petits (15% de la taille de la case) */
+@media (max-width: 768px) {
+  .move-indicator {
+    width: calc(var(--cell-size) * 0.25);
+    height: calc(var(--cell-size) * 0.25);
+  }
+}
+
+/* Indicateur de repositionnement (vert) */
+.reposition-indicator {
+  background-color: rgba(46, 204, 113, 0.4); /* Vert émeraude à 40% d'opacité */
+  border: 2px solid rgba(46, 204, 113, 0.8);
+  animation: pulse-green 1.5s infinite;
+}
+
+@keyframes pulse-green {
+  0% { box-shadow: 0 0 5px rgba(46, 204, 113, 0.5); }
+  50% { box-shadow: 0 0 15px rgba(46, 204, 113, 0.8); }
+  100% { box-shadow: 0 0 5px rgba(46, 204, 113, 0.5); }
+}
+
+/* Case avec mouvement possible */
+.board-cell.possible-move {
+  cursor: pointer;
+}
+
+/* Lettres de colonne */
+.column-letter {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: 'Inter', sans-serif;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Couleur des lettres - alternance pour damier 8x8 */
+/* Ligne du bas : cases 57-64 */
+/* Lettre a (case 57) - fond bleu → lettre blanche */
+.board-cell:nth-child(57) .column-letter {
+  color: #F2F5FA;
+}
+
+/* Lettre b (case 58) - fond blanc → lettre bleue */
+.board-cell:nth-child(58) .column-letter {
+  color: #5596F2;
+}
+
+/* Lettre c (case 59) - fond bleu → lettre blanche */
+.board-cell:nth-child(59) .column-letter {
+  color: #F2F5FA;
+}
+
+/* Lettre d (case 60) - fond blanc → lettre bleue */
+.board-cell:nth-child(60) .column-letter {
+  color: #5596F2;
+}
+
+/* Lettre e (case 61) - fond bleu → lettre blanche */
+.board-cell:nth-child(61) .column-letter {
+  color: #F2F5FA;
+}
+
+/* Lettre f (case 62) - fond blanc → lettre bleue */
+.board-cell:nth-child(62) .column-letter {
+  color: #5596F2;
+}
+
+/* Lettre g (case 63) - fond bleu → lettre blanche */
+.board-cell:nth-child(63) .column-letter {
+  color: #F2F5FA;
+}
+
+/* Lettre h (case 64) - fond blanc → lettre bleue */
+.board-cell:nth-child(64) .column-letter {
+  color: #5596F2;
+}
+
+/* Alternance des couleurs - Damier 8x8 classique */
+/* Lignes impaires (1, 3, 5, 7) : cases impaires blanches, paires bleues */
+/* Lignes paires (2, 4, 6, 8) : cases paires blanches, impaires bleues */
+
+/* Cases blanches (#F2F5FA) */
+/* Lignes impaires : cases impaires (1, 3, 5, 7) */
+.board-cell:nth-child(16n+1),
+.board-cell:nth-child(16n+3),
+.board-cell:nth-child(16n+5),
+.board-cell:nth-child(16n+7),
+/* Lignes paires : cases paires (2, 4, 6, 8) */
+.board-cell:nth-child(16n+10),
+.board-cell:nth-child(16n+12),
+.board-cell:nth-child(16n+14),
+.board-cell:nth-child(16n+16) {
+  background-color: #F2F5FA;
+}
+
+/* Cases bleues (#5596F2) */
+/* Lignes impaires : cases paires (2, 4, 6, 8) */
+.board-cell:nth-child(16n+2),
+.board-cell:nth-child(16n+4),
+.board-cell:nth-child(16n+6),
+.board-cell:nth-child(16n+8),
+/* Lignes paires : cases impaires (1, 3, 5, 7) */
+.board-cell:nth-child(16n+9),
+.board-cell:nth-child(16n+11),
+.board-cell:nth-child(16n+13),
+.board-cell:nth-child(16n+15) {
+  background-color: #5596F2;
+}
+
+/* États cliqués - Cases bleues deviennent #4CBBE9 */
+.board-cell.clicked:nth-child(16n+2),
+.board-cell.clicked:nth-child(16n+4),
+.board-cell.clicked:nth-child(16n+6),
+.board-cell.clicked:nth-child(16n+8),
+.board-cell.clicked:nth-child(16n+9),
+.board-cell.clicked:nth-child(16n+11),
+.board-cell.clicked:nth-child(16n+13),
+.board-cell.clicked:nth-child(16n+15) {
+  background-color: #4CBBE9 !important;
+}
+
+/* États cliqués - Cases blanches deviennent #9AEBEE */
+.board-cell.clicked:nth-child(16n+1),
+.board-cell.clicked:nth-child(16n+3),
+.board-cell.clicked:nth-child(16n+5),
+.board-cell.clicked:nth-child(16n+7),
+.board-cell.clicked:nth-child(16n+10),
+.board-cell.clicked:nth-child(16n+12),
+.board-cell.clicked:nth-child(16n+14),
+.board-cell.clicked:nth-child(16n+16) {
+  background-color: #9AEBEE !important;
+}

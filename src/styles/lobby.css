@@ -1,0 +1,260 @@
+/* Lobby container */
+.lobby-container {
+  min-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.lobby-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.lobby-user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.lobby-username {
+  font-weight: 600;
+  color: #333;
+  font-size: 18px;
+}
+
+.lobby-signout-btn {
+  padding: 8px 16px;
+  background: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: transform 0.2s;
+}
+
+.lobby-signout-btn:hover {
+  transform: translateY(-2px);
+  background: #c53030;
+}
+
+.lobby-content {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.lobby-section {
+  background: white;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.lobby-section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20px;
+  border-bottom: 3px solid #667eea;
+  padding-bottom: 10px;
+}
+
+.play-local-btn {
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.play-local-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(72, 187, 120, 0.4);
+}
+
+.lobby-search {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 16px;
+  margin-bottom: 15px;
+  transition: border-color 0.3s;
+}
+
+.lobby-search:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.lobby-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lobby-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: #f7fafc;
+  border-radius: 10px;
+  border: 2px solid #e2e8f0;
+  transition: border-color 0.3s, transform 0.2s;
+}
+
+.lobby-item:hover {
+  border-color: #667eea;
+  transform: translateX(5px);
+}
+
+.lobby-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.lobby-item-info strong {
+  color: #2d3748;
+  font-size: 16px;
+}
+
+.lobby-item-status {
+  color: #718096;
+  font-size: 14px;
+}
+
+.lobby-item-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.lobby-action-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.lobby-action-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.lobby-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lobby-action-btn.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.lobby-action-btn.secondary {
+  background: #e2e8f0;
+  color: #2d3748;
+}
+
+.lobby-action-btn.secondary:hover {
+  background: #cbd5e0;
+}
+
+.lobby-empty {
+  text-align: center;
+  color: #718096;
+  padding: 20px;
+  font-style: italic;
+}
+
+/* Multiplayer Game Styles */
+.multiplayer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: white;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.game-info {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.player-info {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.turn-indicator {
+  color: #48bb78;
+  font-size: 20px;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@media (max-width: 768px) {
+  .lobby-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .lobby-item {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .lobby-item-actions {
+    width: 100%;
+  }
+
+  .lobby-action-btn {
+    flex: 1;
+  }
+
+  .multiplayer-header {
+    flex-direction: column;
+  }
+
+  .game-info {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
