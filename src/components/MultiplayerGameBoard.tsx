@@ -1,13 +1,16 @@
 // Ce fichier contient toute la logique de jeu adaptée pour le multijoueur
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabase'
 import type { Game } from '../lib/supabase'
+import type { GameConfig } from '../types/GameConfig'
+import { DEFAULT_CONFIG, getBoardInfo } from '../types/GameConfig'
+import { getWrappedIndex as utilGetWrappedIndex, getColumnLetters } from '../utils/boardSetup'
+import type { PieceType } from '../utils/boardSetup'
 import '../App.css'
 import '../styles/board.css'
 import '../styles/pieces.css'
 import '../styles/ui.css'
 
-type PieceType = 'blok-blanc' | 'blok-noir' | 'bloker-blanc' | 'bloker-noir' | null
 type PlayerColor = 'blanc' | 'noir'
 
 type MultiplayerGameBoardProps = {
@@ -22,6 +25,32 @@ export function MultiplayerGameBoard({ gameId, myColor, onLeave }: MultiplayerGa
   const [selectedCell, setSelectedCell] = useState<number | null>(null)
   const [possibleMoves, setPossibleMoves] = useState<number[]>([])
   const [loading, setLoading] = useState(true)
+  
+  // États additionnels pour les fonctionnalités complètes
+  const [movesInTurn, setMovesInTurn] = useState<number>(0)
+  const [firstMovePieceIndex, setFirstMovePieceIndex] = useState<number | null>(null)
+  const [lastMove, setLastMove] = useState<{ from: number; to: number } | null>(null)
+  const [capturedBloksWhite, setCapturedBloksWhite] = useState<number>(0)
+  const [capturedBloksBlack, setCapturedBloksBlack] = useState<number>(0)
+  const [winner, setWinner] = useState<PlayerColor | null>(null)
+  const [lastTurnPlayer, setLastTurnPlayer] = useState<PlayerColor | null>(null)
+  
+  // Récupérer la configuration de la partie
+  const config: GameConfig = useMemo(() => {
+    if (game?.game_config) {
+      try {
+        return JSON.parse(game.game_config)
+      } catch {
+        console.warn('Config invalide, utilisation de la config par défaut')
+        return DEFAULT_CONFIG
+      }
+    }
+    return DEFAULT_CONFIG
+  }, [game])
+  
+  const boardInfo = useMemo(() => getBoardInfo(config.boardType), [config.boardType])
+  
+  const currentPlayer = game?.current_turn || 'blanc'
 
   // Synchroniser les pieces quand game change
   useEffect(() => {

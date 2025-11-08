@@ -3,18 +3,36 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import type { GameInvitation, Game, Profile } from '../lib/supabase'
 
+import type { GameConfig } from '../types/GameConfig'
+import { DEFAULT_CONFIG, getBoardInfo } from '../types/GameConfig'
+import { generateInitialBoard } from '../utils/boardSetup'
+
 type LobbyProps = {
   onStartGame: (gameId: string, isWhite: boolean) => void
   onPlayLocal: () => void
+  onPlayBot?: () => void
+  onShowRules?: () => void
+  onInvitePlayer?: (userId: string) => void
+  multiplayerGameConfig?: GameConfig
+  pendingInvitationUserId?: string | null
 }
 
-export function Lobby({ onStartGame, onPlayLocal }: LobbyProps) {
+export function Lobby({ onStartGame, onPlayLocal, onPlayBot, onShowRules, onInvitePlayer, multiplayerGameConfig, pendingInvitationUserId }: LobbyProps) {
   const { profile, signOut } = useAuth()
   const [users, setUsers] = useState<Profile[]>([])
   const [invitations, setInvitations] = useState<GameInvitation[]>([])
   const [games, setGames] = useState<Game[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // Envoyer automatiquement l'invitation quand on revient de la configuration
+  useEffect(() => {
+    let sent = false
+    if (pendingInvitationUserId && multiplayerGameConfig && !sent) {
+      sent = true
+      sendInvitation(pendingInvitationUserId)
+    }
+  }, [pendingInvitationUserId])
 
   useEffect(() => {
     loadUsers()
@@ -111,6 +129,12 @@ export function Lobby({ onStartGame, onPlayLocal }: LobbyProps) {
   }
 
   const sendInvitation = async (toUserId: string) => {
+    // Si onInvitePlayer existe, déclencher l'écran de configuration
+    if (onInvitePlayer && !pendingInvitationUserId) {
+      onInvitePlayer(toUserId)
+      return
+    }
+    
     setLoading(true)
     try {
       const { error } = await supabase
@@ -118,6 +142,7 @@ export function Lobby({ onStartGame, onPlayLocal }: LobbyProps) {
         .insert({
           from_user_id: profile?.id,
           to_user_id: toUserId,
+          game_config: multiplayerGameConfig ? JSON.stringify(multiplayerGameConfig) : null,
         })
 
       if (error) throw error
@@ -132,22 +157,18 @@ export function Lobby({ onStartGame, onPlayLocal }: LobbyProps) {
   const acceptInvitation = async (invitation: GameInvitation) => {
     setLoading(true)
     try {
-      // Créer la partie
-      const initialBoard: Record<number, string | null> = {}
-      for (let i = 0; i < 64; i++) {
-        initialBoard[i] = null
+      // Récupérer la configuration de l'invitation
+      let gameConfig: GameConfig = DEFAULT_CONFIG
+      if (invitation.game_config) {
+        try {
+          gameConfig = JSON.parse(invitation.game_config)
+        } catch {
+          console.warn('Config invalide, utilisation de la config par défaut')
+        }
       }
-      // Position initiale des pièces
-      for (let i = 0; i < 8; i++) initialBoard[i] = 'blok-noir'
-      initialBoard[10] = 'bloker-noir'
-      initialBoard[11] = 'bloker-noir'
-      initialBoard[12] = 'bloker-noir'
-      initialBoard[13] = 'bloker-noir'
-      initialBoard[50] = 'bloker-blanc'
-      initialBoard[51] = 'bloker-blanc'
-      initialBoard[52] = 'bloker-blanc'
-      initialBoard[53] = 'bloker-blanc'
-      for (let i = 56; i < 64; i++) initialBoard[i] = 'blok-blanc'
+
+      // Générer le plateau initial selon la configuration
+      const initialBoard = generateInitialBoard(gameConfig)
 
       const { data: game, error: gameError } = await supabase
         .from('games')
@@ -155,6 +176,7 @@ export function Lobby({ onStartGame, onPlayLocal }: LobbyProps) {
           player_white_id: invitation.from_user_id,
           player_black_id: profile?.id,
           board_state: JSON.stringify(initialBoard),
+          game_config: invitation.game_config || JSON.stringify(DEFAULT_CONFIG),
           status: 'active',
         })
         .select()
@@ -212,11 +234,27 @@ export function Lobby({ onStartGame, onPlayLocal }: LobbyProps) {
       </div>
 
       <div className="lobby-content">
-        {/* Bouton partie locale */}
+        {/* Boutons de jeu */}
         <div className="lobby-section">
-          <button className="play-local-btn" onClick={onPlayLocal}>
-            🎮 Jouer en local
-          </button>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button className="play-local-btn" onClick={onPlayLocal}>
+              🎮 Jouer en local
+            </button>
+            {onPlayBot && (
+              <button className="play-local-btn" onClick={onPlayBot} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+                🤖 Jouer contre le Bot
+              </button>
+            )}
+            {onShowRules && (
+              <button 
+                className="play-local-btn" 
+                onClick={onShowRules} 
+                style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}
+              >
+                📖 Règles du jeu
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Parties en cours */}

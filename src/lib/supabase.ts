@@ -23,6 +23,7 @@ export type GameInvitation = {
   status: 'pending' | 'accepted' | 'declined'
   created_at: string
   from_user?: Profile
+  game_config?: string // JSON stringifié de GameConfig
 }
 
 export type Game = {
@@ -40,4 +41,5 @@ export type Game = {
   updated_at: string
   player_white?: Profile
   player_black?: Profile
+  game_config?: string // JSON stringifié de GameConfig
 }

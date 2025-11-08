@@ -27,3 +27,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Bot training files
+bot-training-checkpoints/
+bot-training-checkpoints-*/
+bot-training-results/
+bot-training-results-*/
+load-bot-weights*.html
+public/bot-weights/
+
+# Training results (balanced - optimal)
+bot-training-checkpoints-balanced/
+bot-training-results-balanced/
