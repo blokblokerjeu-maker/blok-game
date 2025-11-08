@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase'
 import type { GameInvitation, Game, Profile } from '../lib/supabase'
 
 import type { GameConfig } from '../types/GameConfig'
-import { DEFAULT_CONFIG, getBoardInfo } from '../types/GameConfig'
+import { DEFAULT_CONFIG } from '../types/GameConfig'
 import { generateInitialBoard } from '../utils/boardSetup'
 
 type LobbyProps = {
