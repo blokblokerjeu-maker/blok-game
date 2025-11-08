@@ -12,13 +12,7 @@ async function quickTest() {
   console.log('  - Mode verbose activé');
   console.log('  - Pas de sauvegarde\n');
 
-  const trainer = new DQNTrainer({
-    numGames: 10,
-    saveInterval: 999999, // Pas de sauvegarde pendant le test
-    maxMovesPerGame: 200,
-    verbose: true,
-    trainInterval: 4
-  });
+  const trainer = new DQNTrainer();
 
   try {
     const stats = await trainer.train();

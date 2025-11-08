@@ -7,13 +7,7 @@ import { DQNTrainer } from './train-dqn';
 async function ultraQuickTest() {
   console.log('⚡ Test ultra-rapide (2 parties)\n');
 
-  const trainer = new DQNTrainer({
-    numGames: 2,
-    saveInterval: 999999,
-    maxMovesPerGame: 150,  // Augmenté de 100 à 150
-    verbose: false,
-    trainInterval: 4
-  });
+  const trainer = new DQNTrainer();
 
   try {
     const stats = await trainer.train();
